@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MLflow
+mlruns/
+mlartifacts/
+mlflow.db
+
+# Data (raw/generated data kept out of git; regenerate via src/data_generation.py)
+data/processed/
+*.pkl
+*.joblib
+
+# Trained model artifacts / generated reports (regenerate via src/train.py, src/explain.py)
+models/
+reports/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Env secrets
+.env

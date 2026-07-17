@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dự báo nguy cơ biến chứng phẫu thuật (CDC/CCI)</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <h1>Dự báo sớm nguy cơ biến chứng phẫu thuật nặng</h1>
+      <p class="subtitle">Dựa trên thang phân loại Clavien-Dindo (CDC) &middot; nhập hồ sơ trước mổ để ước tính nguy cơ</p>
+    </div>
+    <div class="api-status" id="api-status">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Đang kiểm tra API…</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card form-card">
+      <h2>Hồ sơ bệnh nhân trước mổ</h2>
+      <form id="predict-form">
+        <div class="field-grid">
+          <label class="field">
+            <span>Tuổi</span>
+            <input type="number" name="Age" min="18" max="100" value="62" required />
+          </label>
+          <label class="field">
+            <span>BMI</span>
+            <input type="number" name="BMI" min="10" max="60" step="0.1" value="22.0" required />
+          </label>
+          <label class="field">
+            <span>Điểm ASA</span>
+            <select name="ASA_Score" required>
+              <option value="I">I</option>
+              <option value="II">II</option>
+              <option value="III">III</option>
+              <option value="IV">IV</option>
+              <option value="V">V</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Tính chất mổ</span>
+            <select name="Surgery_Type" required>
+              <option value="CT">Chương trình (CT)</option>
+              <option value="CC">Cấp cứu (CC)</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Bạch cầu trước mổ (WBC, 10<sup>9</sup>/L)</span>
+            <input type="number" name="PreOp_WBC" min="0" max="50" step="0.1" placeholder="Chưa có kết quả" />
+          </label>
+          <label class="field">
+            <span>Albumin máu trước mổ (g/dL)</span>
+            <input type="number" name="PreOp_Albumin" min="0" max="10" step="0.1" placeholder="Chưa có kết quả" />
+          </label>
+          <label class="field field-checkbox">
+            <input type="checkbox" name="Has_Diabetes" />
+            <span>Tiểu đường</span>
+          </label>
+          <label class="field field-checkbox">
+            <input type="checkbox" name="Has_HTN" />
+            <span>Cao huyết áp</span>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Dự báo nguy cơ</button>
+          <button type="button" id="explain-btn" class="btn btn-secondary" disabled>Xem toàn bộ yếu tố (SHAP)</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card result-card" id="result-card" hidden>
+      <h2>Kết quả dự báo</h2>
+      <div class="result-row">
+        <div class="meter-tile">
+          <div class="meter-label">Xác suất biến chứng nặng</div>
+          <div class="meter-value" id="risk-value">–</div>
+          <div class="meter-track">
+            <div class="meter-fill" id="meter-fill"></div>
+          </div>
+        </div>
+        <div class="badge-tile">
+          <span class="status-badge" id="risk-badge">–</span>
+          <div class="meta-line" id="model-meta"></div>
+        </div>
+      </div>
+
+      <div class="top-factors" id="top-factors" hidden>
+        <div class="top-factors-title">Top 3 yếu tố ảnh hưởng nhiều nhất</div>
+        <ol class="factor-list" id="factor-list"></ol>
+      </div>
+      <p class="chart-caption" id="top-factors-error" hidden>Không tính được yếu tố ảnh hưởng cho ca này.</p>
+
+      <div id="explain-section" hidden>
+        <h3>Yếu tố ảnh hưởng đến dự báo</h3>
+        <p class="chart-caption">
+          <span class="legend-key legend-red">●</span> tăng nguy cơ &nbsp;&nbsp;
+          <span class="legend-key legend-blue">●</span> giảm nguy cơ
+        </p>
+        <div class="diverging-chart" id="shap-chart"></div>
+        <button type="button" class="btn-link" id="toggle-table">Xem dạng bảng</button>
+        <table class="data-table" id="shap-table" hidden>
+          <thead>
+            <tr><th>Đặc trưng</th><th>Giá trị (đã chuẩn hóa)</th><th>Đóng góp SHAP</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card batch-card">
+      <h2>Demo dự báo hàng loạt (/predict/batch)</h2>
+      <p class="chart-caption">Chấm nhanh 3 hồ sơ mẫu trong cùng 1 lượt gọi API — dùng cho kịch bản KHTH duyệt danh sách ca mổ trong ngày.</p>
+      <button type="button" class="btn btn-secondary" id="batch-btn">Chạy demo batch</button>
+      <table class="data-table" id="batch-table" hidden>
+        <thead>
+          <tr><th>Ca</th><th>Xác suất</th><th>Phân loại</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card info-card">
+      <h2>Thông tin mô hình đang phục vụ</h2>
+      <dl class="info-list" id="model-info">
+        <dt>Đang tải…</dt>
+      </dl>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
