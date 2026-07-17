@@ -1,0 +1,46 @@
+# Evaluated by Prometheus and visible under Status > Alerts / Rules in its
+# UI. No Alertmanager is wired up in docker-compose.yml, so firing alerts
+# are visible but do not page/email/Slack anyone -- that's a deliberate
+# scope cut (see docs/architecture.md); wiring a receiver is future work.
+groups:
+  - name: cdc_cci_api_alerts
+    rules:
+      - alert: APIDown
+        expr: up{job="cdc_cci_api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API target down"
+          description: "Prometheus has not been able to scrape the API's /metrics endpoint for 1 minute."
+
+      - alert: HighRequestLatency
+        expr: histogram_quantile(0.95, sum(rate(api_request_latency_seconds_bucket[5m])) by (le, endpoint)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p95 latency on {{ $labels.endpoint }}"
+          description: "p95 latency has been above 1s for 5 minutes on endpoint {{ $labels.endpoint }}."
+
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(api_requests_total{status_code=~"5.."}[5m]))
+          / sum(rate(api_requests_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx error rate"
+          description: "More than 5% of requests have failed with a 5xx status over the last 5 minutes."
+
+      - alert: HighRiskPredictionShareAnomalous
+        expr: |
+          sum(rate(predictions_total{high_risk_flag="1"}[15m]))
+          / sum(rate(predictions_total[15m])) > 0.5
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Unusually high share of high-risk predictions"
+          description: "Over 50% of predictions in the last 15 minutes were flagged high-risk (training baseline is ~10%) -- check for possible input distribution drift."
