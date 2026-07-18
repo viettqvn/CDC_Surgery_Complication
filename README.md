@@ -1,6 +1,6 @@
 # CDC/CCI Surgical Risk Prediction
 
-**Dự báo sớm nguy cơ biến chứng phẫu thuật nặng (Clavien-Dindo Grade IV/V), dựa trên hồ sơ bệnh nhân trước mổ.**
+**Dự báo sớm nguy cơ biến chứng phẫu thuật nặng (Clavien-Dindo Grade III/IV/V), dựa trên hồ sơ bệnh nhân trước mổ.**
 
 Đồ án cuối kỳ môn DDM501 (MLOps) — xây dựng đầy đủ một hệ thống ML production: từ sinh dữ liệu, huấn luyện có experiment tracking, REST API serving, web UI, đến containerization và giám sát.
 
