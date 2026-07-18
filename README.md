@@ -4,7 +4,7 @@
 
 Đồ án cuối kỳ môn DDM501 (MLOps) — xây dựng đầy đủ một hệ thống ML production: từ sinh dữ liệu, huấn luyện có experiment tracking, REST API serving, web UI, đến containerization và giám sát.
 
-> Repo: https://github.com/PhamLeTanThinh/CDC_Classification
+> Repo: https://github.com/viettqvn/CDC_Surgery_Complication
 
 ---
 
