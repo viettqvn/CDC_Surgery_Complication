@@ -12,7 +12,7 @@
 
 Thang đo **Clavien-Dindo (CDC)** là chuẩn quốc tế để phân loại mức độ nặng của biến chứng **sau phẫu thuật** (Grade I → V, dựa trên phương pháp điều trị cần dùng). Hạn chế: đây là công cụ đo lường **hồi cứu** — chỉ biết được mức độ biến chứng sau khi nó đã xảy ra, không giúp bệnh viện chuẩn bị trước (đặt máu, giường ICU...).
 
-**Mục tiêu của hệ thống**: dùng hồ sơ bệnh nhân **trước mổ** (tuổi, BMI, điểm ASA, bệnh nền, tính chất mổ, chỉ số cận lâm sàng) để dự báo sớm xác suất bệnh nhân sẽ rơi vào nhóm biến chứng nặng (tương ứng CDC Grade IV/V) — một hệ thống **cảnh báo sớm**, bổ sung cho thang đo CDC chứ không thay thế.
+**Mục tiêu của hệ thống**: dùng hồ sơ bệnh nhân **trước mổ** (tuổi, BMI, điểm ASA, bệnh nền, tính chất mổ, chỉ số cận lâm sàng) để dự báo sớm xác suất bệnh nhân sẽ rơi vào nhóm biến chứng nặng (tương ứng CDC Grade III/IV/V) — một hệ thống **cảnh báo sớm**, bổ sung cho thang đo CDC chứ không thay thế.
 
 - **User**: Phẫu thuật viên, phòng Kế hoạch tổng hợp (KHTH)
 - **Input**: Age, BMI, ASA_Score (I–V), Has_Diabetes, Has_HTN, Surgery_Type (chương trình/cấp cứu), PreOp_WBC, PreOp_Albumin
